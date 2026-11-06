@@ -53,16 +53,16 @@ We started with a form where every field repeated the same markup: a label, a re
 | `touched` | when to start showing errors | `state().touched()` |
 | `errors` | which error messages to list | `state().errors()` |
 
-The wrapper lives in `src/app/components/field/`. Its own CSS is empty — the component declares `host: { class: 'field' }`, hooking the host element into the same global `.field` rules the raw `<div class="field">` markup used.
+The wrapper lives in `src/app/components/field-wrapper/`. Its own CSS is empty — the component declares `host: { class: 'field' }`, hooking the host element into the same global `.field` rules the raw `<div class="field">` markup used.
 
-`field.ts`:
+`field-wrapper.ts`:
 
 ```ts
 @Component({
   selector: 'app-field',
   host: { class: 'field' },
-  templateUrl: './field.html',
-  styleUrl: './field.css',
+  templateUrl: './field-wrapper.html',
+  styleUrl: './field-wrapper.css',
 })
 export class FieldWrapper {
   readonly label = input.required<string>();
@@ -77,7 +77,7 @@ export class FieldWrapper {
 }
 ```
 
-`field.html`:
+`field-wrapper.html`:
 
 ```html
 <label>
@@ -96,7 +96,7 @@ export class FieldWrapper {
 </ul>
 ```
 
-The hint phrasing lives in a **helper function** (in `field.ts`, below the component), not in the template. One small formatter decides the wording for any range - *between*, *at least* or *at most* - and `buildHints` just applies it to both pairs of limits and keeps whatever came back:
+The hint phrasing lives in a **helper function** (in `field-wrapper.ts`, below the component), not in the template. One small formatter decides the wording for any range - *between*, *at least* or *at most* - and `buildHints` just applies it to both pairs of limits and keeps whatever came back:
 
 ```ts
 function rangeHint(min?: number, max?: number, unit = ''): string {
