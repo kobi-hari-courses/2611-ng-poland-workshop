@@ -1,5 +1,6 @@
 import { Component, computed, contentChild, input } from '@angular/core';
 import { FieldState, FormField } from '@angular/forms/signals';
+import { MIN_WORDS } from '../../validators/min-words';
 
 @Component({
   selector: 'app-field',
@@ -26,9 +27,14 @@ function rangeHint(min?: number, max?: number, unit = ''): string {
   return '';
 }
 
+function wordsHint(min?: number): string {
+  return min != null ? `At least ${min} words` : '';
+}
+
 function buildHints(state: FieldState<any>): string[] {
   return [
     rangeHint(state.minLength?.(), state.maxLength?.(), ' characters'),
     rangeHint(state.min?.(), state.max?.()),
+    wordsHint(state.metadata(MIN_WORDS)?.()),
   ].filter(hint => hint !== '');
 }
