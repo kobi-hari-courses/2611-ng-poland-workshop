@@ -53,25 +53,15 @@ We started with a form where every field repeated the same markup: a label, a re
 | `touched` | when to start showing errors | `state().touched()` |
 | `errors` | which error messages to list | `state().errors()` |
 
+The wrapper lives in `src/app/components/field/` and is split into **two files**: `field.ts` and `field.html`. It needs **no CSS file** — the global form styles already cover it: the component declares `host: { class: 'field' }`, which hooks the host element into the same `.field` rules (layout, hint and error styling) the raw `<div class="field">` markup used.
+
+`field.ts`:
+
 ```ts
 @Component({
   selector: 'app-field',
-  template: `
-    <label>
-      {{ label() }} @if (required()) { <span class="required">*</span> }
-      <ng-content />
-    </label>
-
-    @for (hint of hints(); track hint) { <small>{{ hint }}</small> }
-
-    <ul class="errors" aria-live="polite">
-      @if (touched()) {
-        @for (error of errors(); track $index) {
-          <li>{{ error.message ?? error.kind }}</li>
-        }
-      }
-    </ul>
-  `,
+  host: { class: 'field' },
+  templateUrl: './field.html',
 })
 export class FieldWrapper {
   readonly label = input.required<string>();
@@ -86,7 +76,26 @@ export class FieldWrapper {
 }
 ```
 
-The hint phrasing lives in a **helper function**, not in the template. One small formatter decides the wording for any range — *between*, *at least* or *at most* — and `buildHints` just applies it to both pairs of limits and keeps whatever came back:
+`field.html`:
+
+```html
+<label>
+  {{ label() }} @if (required()) { <span class="required">*</span> }
+  <ng-content />
+</label>
+
+@for (hint of hints(); track hint) { <small>{{ hint }}</small> }
+
+<ul class="errors" aria-live="polite">
+  @if (touched()) {
+    @for (error of errors(); track $index) {
+      <li>{{ error.message ?? error.kind }}</li>
+    }
+  }
+</ul>
+```
+
+The hint phrasing lives in a **helper function** (in `field.ts`, below the component), not in the template. One small formatter decides the wording for any range — *between*, *at least* or *at most* — and `buildHints` just applies it to both pairs of limits and keeps whatever came back:
 
 ```ts
 function rangeHint(min?: number, max?: number, unit = ''): string {
@@ -207,6 +216,8 @@ export function countWords(text: string): number {
 
 ### Version 1 – `min` is a number
 
+The validator lives in `src/app/validators/min-words.ts` (created live), importing `countWords` from the utils:
+
 ```ts
 export function minWords(path: SchemaPath<string>, min: number, options?: { message?: string }) {
   validate(path, (ctx) => {
@@ -285,7 +296,7 @@ export const NO_CONSECUTIVE_SEPARATORS = /^(?!.*[ '-]{2})/u;
 
 The demo starts innocently with `LETTERS_ONLY` — the name gives nothing away — and real names immediately prove it wrong, twice over. Polish letters fail: *Łukasz*, *Michał* and *Grzegorz* are all "invalid". But so do perfectly ordinary names with separators: *O'Brien*, *Jean-Pierre*, *Mary Ann* — and the ultimate counter-example, *Skłodowska-Curie*, which fails on **both** counts (the `ł` and the hyphen). The fix is `UNICODE_LETTERS_AND_SEPARATORS`: `\p{L}` with the `u` flag matches a letter from **any** alphabet, and the character class also admits spaces, hyphens and apostrophes.
 
-In the session we only write the rule function that puts them to work:
+In the session we only write the rule function that puts them to work, in `src/app/validators/person-name.ts`:
 
 ```ts
 export function personName(path: SchemaPath<string>) {
@@ -317,7 +328,7 @@ export function personName(path: SchemaPath<string>) {
 
 ### 4b. A reusable schema - `speakerSchema`
 
-A rule function covers **one field**. A `schema<T>()` covers **a whole object**, and can be reused wherever that object type appears in the model:
+A rule function covers **one field**. A `schema<T>()` covers **a whole object**, and can be reused wherever that object type appears in the model. It lives in `src/app/schemas/speaker.schema.ts`:
 
 ```ts
 export const speakerSchema = schema<Speaker>((s) => {
@@ -329,7 +340,7 @@ export const speakerSchema = schema<Speaker>((s) => {
 });
 ```
 
-Reusing it in the talk form:
+Reusing it in the talk schema, extracted from the component into `src/app/schemas/talk.schema.ts`:
 
 ```ts
 export const talkSchema = schema<TalkSubmission>((p) => {
