@@ -16,6 +16,7 @@ import {
 } from '../../models/talk-submission.model';
 import { FieldWrapper } from '../field-wrapper/field-wrapper';
 import { Rating } from '../rating/rating';
+import { minWords } from '../../validators/min-words';
 
 @Component({
   selector: 'app-talk-form',
@@ -32,7 +33,7 @@ export class TalkForm {
     maxLength(p.title, 80);
 
     required(p.abstract);
-    minLength(p.abstract, 100);
+    minWords(p.abstract, (ctx) => ctx.valueOf(p.expertise) >= 4 ? 20 : 10);
 
     min(p.expertise, 1);
     max(p.expertise, 5);
