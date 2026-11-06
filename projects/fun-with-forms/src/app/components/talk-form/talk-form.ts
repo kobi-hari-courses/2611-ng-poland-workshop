@@ -15,10 +15,11 @@ import {
   emptyTalkSubmission,
 } from '../../models/talk-submission.model';
 import { FieldWrapper } from '../field-wrapper/field-wrapper';
+import { Rating } from '../rating/rating';
 
 @Component({
   selector: 'app-talk-form',
-  imports: [FormField, FieldWrapper],
+  imports: [FormField, FieldWrapper, Rating],
   templateUrl: './talk-form.html',
   styleUrl: './talk-form.css',
 })

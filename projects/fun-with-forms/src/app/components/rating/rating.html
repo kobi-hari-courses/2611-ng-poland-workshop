@@ -1,1 +1,7 @@
-
+@for (star of stars(); track star) {
+  <button type="button"
+    [disabled]="disabled() || star < effectiveMin()"
+    (click)="value.set(star)">
+    {{ star <= value() ? '★' : '☆' }}
+  </button>
+}
