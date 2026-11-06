@@ -43,7 +43,7 @@ We started with a form where every field repeated the same markup: a label, a re
 `<app-field>` wraps an input and **reads everything it needs from the field it contains**. We live-coded it in three moves:
 
 1. Look up the projected `FormField` directive with `contentChild.required(FormField)`.
-2. Reach its `state()` — it already holds all the information we were typing by hand.
+2. Reach its `state()` - it already holds all the information we were typing by hand.
 3. Derive **computed signals** that decide *what* to present and *when*:
 
 | Computed | What it decides | Where it reads from |
@@ -53,7 +53,7 @@ We started with a form where every field repeated the same markup: a label, a re
 | `touched` | when to start showing errors | `state().touched()` |
 | `errors` | which error messages to list | `state().errors()` |
 
-The wrapper lives in `src/app/components/field/` and is split into **two files**: `field.ts` and `field.html`. It needs **no CSS file** — the global form styles already cover it: the component declares `host: { class: 'field' }`, which hooks the host element into the same `.field` rules (layout, hint and error styling) the raw `<div class="field">` markup used.
+The wrapper lives in `src/app/components/field/` and is split into **two files**: `field.ts` and `field.html`. It needs **no CSS file** - the global form styles already cover it: the component declares `host: { class: 'field' }`, which hooks the host element into the same `.field` rules (layout, hint and error styling) the raw `<div class="field">` markup used.
 
 `field.ts`:
 
@@ -95,7 +95,7 @@ export class FieldWrapper {
 </ul>
 ```
 
-The hint phrasing lives in a **helper function** (in `field.ts`, below the component), not in the template. One small formatter decides the wording for any range — *between*, *at least* or *at most* — and `buildHints` just applies it to both pairs of limits and keeps whatever came back:
+The hint phrasing lives in a **helper function** (in `field.ts`, below the component), not in the template. One small formatter decides the wording for any range - *between*, *at least* or *at most* - and `buildHints` just applies it to both pairs of limits and keeps whatever came back:
 
 ```ts
 function rangeHint(min?: number, max?: number, unit = ''): string {
@@ -123,7 +123,7 @@ Usage:
 
 ### Points to remember
 - **The schema is the single source of truth.** Adding `required(p.title)` or `maxLength(p.title, 40)` to the schema updates the asterisk, the hints and the errors with no template changes.
-- **Limits are optional properties.** `minLength?.()` / `min?.()` only exist when the schema declares them — which is exactly what lets the helper decide between *at least*, *at most* and *between*.
+- **Limits are optional properties.** `minLength?.()` / `min?.()` only exist when the schema declares them - which is exactly what lets the helper decide between *at least*, *at most* and *between*.
 - **Computed signals keep the template dumb.** The template renders `hints()` and `errors()`; all the deciding happens in the class and the helper function.
 - **Accessibility.** `aria-live="polite"` on the error list makes screen readers announce errors as they appear. It costs one attribute, and only the wrapper needs it.
 
@@ -139,7 +139,7 @@ A component becomes a Signal Forms control by implementing **`FormValueControl<T
 - **Required:** `value = model<T>()`. This keeps the control in sync with the field's value in both directions.
 - **Optional:** inputs with names from the contract, such as `min`, `max`, `disabled`, `required` and `errors`. When the control declares them, **`[formField]` fills them in from the schema automatically.**
 
-The control lives in `src/app/components/rating/` and is split into **three files**: `rating.ts`, `rating.html` and `rating.css`. The CSS was prepared ahead of the session (star colors, hover/press effects, disabled and focus states) — in the workshop we live-code the class and the template.
+The control lives in `src/app/components/rating/` and is split into **three files**: `rating.ts`, `rating.html` and `rating.css`. The CSS was prepared ahead of the session (star colors, hover/press effects, disabled and focus states) - in the workshop we live-code the class and the template.
 
 `rating.ts`:
 
@@ -163,7 +163,7 @@ export class Rating implements FormValueControl<number> {
 }
 ```
 
-The `min` and `max` inputs are `number | undefined` — they only carry a value when the schema declares a rule. The two computed signals turn them into **effective limits** with the defaults applied once, so the rest of the code never needs `??` again.
+The `min` and `max` inputs are `number | undefined` - they only carry a value when the schema declares a rule. The two computed signals turn them into **effective limits** with the defaults applied once, so the rest of the code never needs `??` again.
 
 `rating.html`:
 
@@ -237,7 +237,7 @@ minWords(p.abstract, 30);
 
 ### Version 2 – `min` is a number **or a `LogicFn`**
 
-The built-in validators don't only take fixed limits — they also accept a **`LogicFn`**, a function that receives the `FieldContext` and computes the limit reactively. We upgraded `minWords` to do the same, so the minimum can **depend on other fields**:
+The built-in validators don't only take fixed limits - they also accept a **`LogicFn`**, a function that receives the `FieldContext` and computes the limit reactively. We upgraded `minWords` to do the same, so the minimum can **depend on other fields**:
 
 ```ts
 export function minWords(
@@ -254,7 +254,7 @@ export function minWords(
 }
 ```
 
-Usage: the self-declared experts have to prove it — the required word count now follows the expertise rating:
+Usage: the self-declared experts have to prove it - the required word count now follows the expertise rating:
 
 ```ts
 minWords(p.abstract, (ctx) => ctx.valueOf(p.expertise) >= 4 ? 20 : 10);
@@ -264,7 +264,7 @@ minWords(p.abstract, (ctx) => ctx.valueOf(p.expertise) >= 4 ? 20 : 10);
 - **Returning `undefined`** means the value is valid.
 - **The returned error** has a `kind`, which you can check in code, and a `message`, which `<app-field>` shows automatically.
 - **Same shape as the built-ins.** Following the `(path, number | LogicFn, options)` signature makes custom validators feel like part of the framework.
-- **`LogicFn` is the reactivity hook.** It runs inside the validation's reactive context, so reading another field with `ctx.valueOf(p.expertise)` creates a dependency — when the rating changes, the abstract is re-validated automatically.
+- **`LogicFn` is the reactivity hook.** It runs inside the validation's reactive context, so reading another field with `ctx.valueOf(p.expertise)` creates a dependency - when the rating changes, the abstract is re-validated automatically.
 
 > **To be continued at the conference.** Built-in validators such as `minLength` also *publish* their limit, which is why `<app-field>` can show "at least 3 characters" before anything is typed. Our `minWords` doesn't do this yet, so the wrapper can't show "at least 30 words". We'll cover how to do it, along with several other features, in the conference talk.
 
@@ -278,7 +278,7 @@ Some fields share the same rules. A name should follow the same rules whether it
 
 A plain function that applies **several validators to one field**. Each pattern checks **one kind of mistake**, so each mistake gets its own error message.
 
-The regular expressions are prepared **ahead of the session** in `src/app/utils/name-patterns.ts` — live-typing a regex is nobody's idea of fun:
+The regular expressions are prepared **ahead of the session** in `src/app/utils/name-patterns.ts` - live-typing a regex is nobody's idea of fun:
 
 ```ts
 /** Only letters are allowed. */
@@ -294,7 +294,7 @@ export const STARTS_AND_ENDS_WITH_LETTER = /^\p{L}(.*\p{L})?$/u;
 export const NO_CONSECUTIVE_SEPARATORS = /^(?!.*[ '-]{2})/u;
 ```
 
-The demo starts innocently with `LETTERS_ONLY` — the name gives nothing away — and real names immediately prove it wrong, twice over. Polish letters fail: *Łukasz*, *Michał* and *Grzegorz* are all "invalid". But so do perfectly ordinary names with separators: *O'Brien*, *Jean-Pierre*, *Mary Ann* — and the ultimate counter-example, *Skłodowska-Curie*, which fails on **both** counts (the `ł` and the hyphen). The fix is `UNICODE_LETTERS_AND_SEPARATORS`: `\p{L}` with the `u` flag matches a letter from **any** alphabet, and the character class also admits spaces, hyphens and apostrophes.
+The demo starts innocently with `LETTERS_ONLY` - the name gives nothing away - and real names immediately prove it wrong, twice over. Polish letters fail: *Łukasz*, *Michał* and *Grzegorz* are all "invalid". But so do perfectly ordinary names with separators: *O'Brien*, *Jean-Pierre*, *Mary Ann* - and the ultimate counter-example, *Skłodowska-Curie*, which fails on **both** counts (the `ł` and the hyphen). The fix is `UNICODE_LETTERS_AND_SEPARATORS`: `\p{L}` with the `u` flag matches a letter from **any** alphabet, and the character class also admits spaces, hyphens and apostrophes.
 
 In the session we only write the rule function that puts them to work, in `src/app/validators/person-name.ts`:
 
