@@ -14,10 +14,11 @@ import {
   emptySpeaker,
   emptyTalkSubmission,
 } from '../../models/talk-submission.model';
+import { FieldWrapper } from '../field-wrapper/field-wrapper';
 
 @Component({
   selector: 'app-talk-form',
-  imports: [FormField],
+  imports: [FormField, FieldWrapper],
   templateUrl: './talk-form.html',
   styleUrl: './talk-form.css',
 })

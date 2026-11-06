@@ -106,7 +106,7 @@ function rangeHint(min?: number, max?: number, unit = ''): string {
   return '';
 }
 
-function buildHints(state: FieldState<unknown>): string[] {
+function buildHints(state: FieldState<any>): string[] {
   return [
     rangeHint(state.minLength?.(), state.maxLength?.(), ' characters'),
     rangeHint(state.min?.(), state.max?.()),

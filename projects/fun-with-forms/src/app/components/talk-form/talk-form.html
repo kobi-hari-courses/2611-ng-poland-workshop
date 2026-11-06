@@ -4,113 +4,37 @@
   <section>
     <h2>Your talk</h2>
 
-    <div class="field">
-      <label>
-        Title @if (f.title().required()) { <span class="required">*</span> }
-        <input type="text" [formField]="f.title" />
-      </label>
-      <small>At least 3 characters, up to 80 characters</small>
-      <ul class="errors" aria-live="polite">
-        @if (f.title().touched()) {
-          @for (error of f.title().errors(); track $index) {
-            <li>{{ error.message ?? error.kind }}</li>
-          }
-        }
-      </ul>
-    </div>
+    <app-field label="Title">
+      <input type="text" [formField]="f.title" />
+    </app-field>
 
-    <div class="field">
-      <label>
-        Abstract @if (f.abstract().required()) { <span class="required">*</span> }
-        <textarea rows="6" [formField]="f.abstract"></textarea>
-      </label>
-      <small>At least 100 characters</small>
-      <ul class="errors" aria-live="polite">
-        @if (f.abstract().touched()) {
-          @for (error of f.abstract().errors(); track $index) {
-            <li>{{ error.message ?? error.kind }}</li>
-          }
-        }
-      </ul>
-    </div>
+    <app-field label="Abstract">
+      <textarea rows="6" [formField]="f.abstract"></textarea>
+    </app-field>
 
-    <div class="field">
-      <label>
-        Expertise level
-        <input type="number" [formField]="f.expertise" />
-      </label>
-      <small>From 1 to 5</small>
-      <ul class="errors" aria-live="polite">
-        @if (f.expertise().touched()) {
-          @for (error of f.expertise().errors(); track $index) {
-            <li>{{ error.message ?? error.kind }}</li>
-          }
-        }
-      </ul>
-    </div>
+    <app-field label="Expertise level">
+      <input type="number" [formField]="f.expertise" />
+    </app-field>
   </section>
 
   <section class="theme-2">
     <h2>Speaker</h2>
 
-    <div class="field">
-      <label>
-        First name @if (f.speaker.firstName().required()) { <span class="required">*</span> }
-        <input type="text" [formField]="f.speaker.firstName" />
-      </label>
-      <small>At least 2 characters, up to 40 characters</small>
-      <ul class="errors" aria-live="polite">
-        @if (f.speaker.firstName().touched()) {
-          @for (error of f.speaker.firstName().errors(); track $index) {
-            <li>{{ error.message ?? error.kind }}</li>
-          }
-        }
-      </ul>
-    </div>
+    <app-field label="First name">
+      <input type="text" [formField]="f.speaker.firstName" />
+    </app-field>
 
-    <div class="field">
-      <label>
-        Last name @if (f.speaker.lastName().required()) { <span class="required">*</span> }
-        <input type="text" [formField]="f.speaker.lastName" />
-      </label>
-      <small>At least 2 characters, up to 40 characters</small>
-      <ul class="errors" aria-live="polite">
-        @if (f.speaker.lastName().touched()) {
-          @for (error of f.speaker.lastName().errors(); track $index) {
-            <li>{{ error.message ?? error.kind }}</li>
-          }
-        }
-      </ul>
-    </div>
+    <app-field label="Last name">
+      <input type="text" [formField]="f.speaker.lastName" />
+    </app-field>
 
-    <div class="field">
-      <label>
-        Email @if (f.speaker.email().required()) { <span class="required">*</span> }
-        <input type="email" [formField]="f.speaker.email" />
-      </label>
-      <ul class="errors" aria-live="polite">
-        @if (f.speaker.email().touched()) {
-          @for (error of f.speaker.email().errors(); track $index) {
-            <li>{{ error.message ?? error.kind }}</li>
-          }
-        }
-      </ul>
-    </div>
+    <app-field label="Email">
+      <input type="email" [formField]="f.speaker.email" />
+    </app-field>
 
-    <div class="field">
-      <label>
-        Bio
-        <textarea rows="4" [formField]="f.speaker.bio"></textarea>
-      </label>
-      <small>Up to 500 characters</small>
-      <ul class="errors" aria-live="polite">
-        @if (f.speaker.bio().touched()) {
-          @for (error of f.speaker.bio().errors(); track $index) {
-            <li>{{ error.message ?? error.kind }}</li>
-          }
-        }
-      </ul>
-    </div>
+    <app-field label="Bio">
+      <textarea rows="4" [formField]="f.speaker.bio"></textarea>
+    </app-field>
   </section>
 
   <section class="theme-3">
@@ -140,64 +64,21 @@
           🗑&#xFE0E;
         </button>
 
-        <div class="field">
-          <label>
-            First name @if (coSpeaker.firstName().required()) { <span class="required">*</span> }
-            <input type="text" [formField]="coSpeaker.firstName" />
-          </label>
-          <small>At least 2 characters, up to 40 characters</small>
-          <ul class="errors" aria-live="polite">
-            @if (coSpeaker.firstName().touched()) {
-              @for (error of coSpeaker.firstName().errors(); track $index) {
-                <li>{{ error.message ?? error.kind }}</li>
-              }
-            }
-          </ul>
-        </div>
+        <app-field label="First name">
+          <input type="text" [formField]="coSpeaker.firstName" />
+        </app-field>
 
-        <div class="field">
-          <label>
-            Last name @if (coSpeaker.lastName().required()) { <span class="required">*</span> }
-            <input type="text" [formField]="coSpeaker.lastName" />
-          </label>
-          <small>At least 2 characters, up to 40 characters</small>
-          <ul class="errors" aria-live="polite">
-            @if (coSpeaker.lastName().touched()) {
-              @for (error of coSpeaker.lastName().errors(); track $index) {
-                <li>{{ error.message ?? error.kind }}</li>
-              }
-            }
-          </ul>
-        </div>
+        <app-field label="Last name">
+          <input type="text" [formField]="coSpeaker.lastName" />
+        </app-field>
 
-        <div class="field">
-          <label>
-            Email @if (coSpeaker.email().required()) { <span class="required">*</span> }
-            <input type="email" [formField]="coSpeaker.email" />
-          </label>
-          <ul class="errors" aria-live="polite">
-            @if (coSpeaker.email().touched()) {
-              @for (error of coSpeaker.email().errors(); track $index) {
-                <li>{{ error.message ?? error.kind }}</li>
-              }
-            }
-          </ul>
-        </div>
+        <app-field label="Email">
+          <input type="email" [formField]="coSpeaker.email" />
+        </app-field>
 
-        <div class="field">
-          <label>
-            Bio
-            <textarea rows="4" [formField]="coSpeaker.bio"></textarea>
-          </label>
-          <small>Up to 500 characters</small>
-          <ul class="errors" aria-live="polite">
-            @if (coSpeaker.bio().touched()) {
-              @for (error of coSpeaker.bio().errors(); track $index) {
-                <li>{{ error.message ?? error.kind }}</li>
-              }
-            }
-          </ul>
-        </div>
+        <app-field label="Bio">
+          <textarea rows="4" [formField]="coSpeaker.bio"></textarea>
+        </app-field>
       </fieldset>
     } @empty {
       <p class="empty">No co-speakers yet.</p>

@@ -1,1 +1,14 @@
+<label>
+  {{ label() }} @if (required()) { <span class="required">*</span> }
+  <ng-content />
+</label>
 
+@for (hint of hints(); track hint) { <small>{{ hint }}</small> }
+
+<ul class="errors" aria-live="polite">
+  @if (touched()) {
+    @for (error of errors(); track $index) {
+      <li>{{ error.message ?? error.kind }}</li>
+    }
+  }
+</ul>
