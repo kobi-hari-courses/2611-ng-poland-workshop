@@ -1,9 +1,9 @@
-import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component } from '@angular/core';
+import { TalkForm } from './components/talk-form/talk-form';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [TalkForm],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
