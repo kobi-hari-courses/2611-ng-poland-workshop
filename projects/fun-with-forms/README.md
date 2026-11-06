@@ -53,7 +53,7 @@ We started with a form where every field repeated the same markup: a label, a re
 | `touched` | when to start showing errors | `state().touched()` |
 | `errors` | which error messages to list | `state().errors()` |
 
-The wrapper lives in `src/app/components/field/` and is split into **two files**: `field.ts` and `field.html`. It needs **no CSS file** - the global form styles already cover it: the component declares `host: { class: 'field' }`, which hooks the host element into the same `.field` rules (layout, hint and error styling) the raw `<div class="field">` markup used.
+The wrapper lives in `src/app/components/field/`. Its own CSS is empty — the component declares `host: { class: 'field' }`, hooking the host element into the same global `.field` rules the raw `<div class="field">` markup used.
 
 `field.ts`:
 
@@ -62,6 +62,7 @@ The wrapper lives in `src/app/components/field/` and is split into **two files**
   selector: 'app-field',
   host: { class: 'field' },
   templateUrl: './field.html',
+  styleUrl: './field.css',
 })
 export class FieldWrapper {
   readonly label = input.required<string>();
@@ -139,7 +140,7 @@ A component becomes a Signal Forms control by implementing **`FormValueControl<T
 - **Required:** `value = model<T>()`. This keeps the control in sync with the field's value in both directions.
 - **Optional:** inputs with names from the contract, such as `min`, `max`, `disabled`, `required` and `errors`. When the control declares them, **`[formField]` fills them in from the schema automatically.**
 
-The control lives in `src/app/components/rating/` and is split into **three files**: `rating.ts`, `rating.html` and `rating.css`. The CSS was prepared ahead of the session (star colors, hover/press effects, disabled and focus states) - in the workshop we live-code the class and the template.
+The control lives in `src/app/components/rating/`. The CSS was prepared ahead of the session (star colors, hover/press effects, disabled and focus states) — in the workshop we live-code the class and the template.
 
 `rating.ts`:
 

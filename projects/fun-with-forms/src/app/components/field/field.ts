@@ -4,6 +4,7 @@ import { Component } from '@angular/core';
   selector: 'app-field',
   host: { class: 'field' },
   templateUrl: './field.html',
+  styleUrl: './field.css',
 })
 export class FieldWrapper {
 }
