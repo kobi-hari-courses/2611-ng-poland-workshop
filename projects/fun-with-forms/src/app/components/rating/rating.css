@@ -1,0 +1,35 @@
+:host {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+button {
+  border: none;
+  background: transparent;
+  padding: 0;
+  font-size: 1.7rem;
+  line-height: 1;
+  color: var(--color-star);
+  cursor: pointer;
+  transition: transform 0.1s ease, color 0.15s ease;
+}
+
+button:hover:not(:disabled) {
+  transform: scale(1.2);
+}
+
+button:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+button:focus-visible {
+  outline: none;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--focus-ring);
+}
+
+button:disabled {
+  color: var(--color-border);
+  cursor: not-allowed;
+}

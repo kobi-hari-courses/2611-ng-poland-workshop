@@ -40,30 +40,33 @@ interface Speaker {
 We started with a form where every field repeated the same markup: a label, a required asterisk, a hint such as "at least 3 characters", and a list of error messages shown after the field is touched. Most of the template was this repetition rather than the actual form.
 
 ### The solution
-`<app-field>` wraps an input and **reads everything it needs from the field it contains**. It looks up the projected `FormField` directive with `contentChild`, and its `state()` already holds all the information we were typing by hand:
+`<app-field>` wraps an input and **reads everything it needs from the field it contains**. We live-coded it in three moves:
 
-| What we show | Where it comes from |
-|---|---|
-| Required asterisk `*` | `state().required()` |
-| Hints ("min 3 / max 40 characters") | `state().minLength?.()`, `state().maxLength?.()` |
-| Error messages | `state().errors()` |
-| When to show the errors | `state().touched()` |
+1. Look up the projected `FormField` directive with `contentChild.required(FormField)`.
+2. Reach its `state()` — it already holds all the information we were typing by hand.
+3. Derive **computed signals** that decide *what* to present and *when*:
+
+| Computed | What it decides | Where it reads from |
+|---|---|---|
+| `required` | show the asterisk `*` | `state().required()` |
+| `hints` | an array of hint lines, phrased by a helper function | `state().minLength?.()`, `state().maxLength?.()`, `state().min?.()`, `state().max?.()` |
+| `touched` | when to start showing errors | `state().touched()` |
+| `errors` | which error messages to list | `state().errors()` |
 
 ```ts
 @Component({
   selector: 'app-field',
   template: `
     <label>
-      {{ label() }} @if (state().required()) { <span class="required">*</span> }
+      {{ label() }} @if (required()) { <span class="required">*</span> }
       <ng-content />
     </label>
 
-    @if (state().minLength?.(); as min) { <small>At least {{ min }} characters</small> }
-    @if (state().maxLength?.(); as max) { <small>Up to {{ max }} characters</small> }
+    @for (hint of hints(); track hint) { <small>{{ hint }}</small> }
 
     <ul class="errors" aria-live="polite">
-      @if (state().touched()) {
-        @for (error of state().errors(); track $index) {
+      @if (touched()) {
+        @for (error of errors(); track $index) {
           <li>{{ error.message ?? error.kind }}</li>
         }
       }
@@ -72,8 +75,32 @@ We started with a form where every field repeated the same markup: a label, a re
 })
 export class FieldWrapper {
   readonly label = input.required<string>();
+
   readonly formField = contentChild.required(FormField);
   readonly state = computed(() => this.formField().state());
+
+  readonly required = computed(() => this.state().required());
+  readonly touched = computed(() => this.state().touched());
+  readonly errors = computed(() => this.state().errors());
+  readonly hints = computed(() => buildHints(this.state()));
+}
+```
+
+The hint phrasing lives in a **helper function**, not in the template. One small formatter decides the wording for any range — *between*, *at least* or *at most* — and `buildHints` just applies it to both pairs of limits and keeps whatever came back:
+
+```ts
+function rangeHint(min?: number, max?: number, unit = ''): string {
+  if (min != null && max != null) return `Between ${min} and ${max}${unit}`;
+  if (min != null) return `At least ${min}${unit}`;
+  if (max != null) return `At most ${max}${unit}`;
+  return '';
+}
+
+function buildHints(state: FieldState<unknown>): string[] {
+  return [
+    rangeHint(state.minLength?.(), state.maxLength?.(), ' characters'),
+    rangeHint(state.min?.(), state.max?.()),
+  ].filter(hint => hint !== '');
 }
 ```
 
@@ -87,6 +114,8 @@ Usage:
 
 ### Points to remember
 - **The schema is the single source of truth.** Adding `required(p.title)` or `maxLength(p.title, 40)` to the schema updates the asterisk, the hints and the errors with no template changes.
+- **Limits are optional properties.** `minLength?.()` / `min?.()` only exist when the schema declares them — which is exactly what lets the helper decide between *at least*, *at most* and *between*.
+- **Computed signals keep the template dumb.** The template renders `hints()` and `errors()`; all the deciding happens in the class and the helper function.
 - **Accessibility.** `aria-live="polite"` on the error list makes screen readers announce errors as they appear. It costs one attribute, and only the wrapper needs it.
 
 ---
@@ -101,18 +130,15 @@ A component becomes a Signal Forms control by implementing **`FormValueControl<T
 - **Required:** `value = model<T>()`. This keeps the control in sync with the field's value in both directions.
 - **Optional:** inputs with names from the contract, such as `min`, `max`, `disabled`, `required` and `errors`. When the control declares them, **`[formField]` fills them in from the schema automatically.**
 
+The control lives in `src/app/components/rating/` and is split into **three files**: `rating.ts`, `rating.html` and `rating.css`. The CSS was prepared ahead of the session (star colors, hover/press effects, disabled and focus states) — in the workshop we live-code the class and the template.
+
+`rating.ts`:
+
 ```ts
 @Component({
   selector: 'app-rating',
-  template: `
-    @for (star of stars(); track star) {
-      <button type="button"
-        [disabled]="disabled() || star < (min() ?? 1)"
-        (click)="value.set(star)">
-        {{ star <= value() ? '★' : '☆' }}
-      </button>
-    }
-  `,
+  templateUrl: './rating.html',
+  styleUrl: './rating.css',
 })
 export class Rating implements FormValueControl<number> {
   readonly value = model(0);
@@ -120,8 +146,25 @@ export class Rating implements FormValueControl<number> {
   readonly max = input<number>();
   readonly disabled = input(false);
 
+  readonly effectiveMin = computed(() => this.min() ?? 1);
+  readonly effectiveMax = computed(() => this.max() ?? 5);
+
   readonly stars = computed(() =>
-    Array.from({ length: this.max() ?? 5 }, (_, i) => i + 1));
+    Array.from({ length: this.effectiveMax() }, (_, i) => i + 1));
+}
+```
+
+The `min` and `max` inputs are `number | undefined` — they only carry a value when the schema declares a rule. The two computed signals turn them into **effective limits** with the defaults applied once, so the rest of the code never needs `??` again.
+
+`rating.html`:
+
+```html
+@for (star of stars(); track star) {
+  <button type="button"
+    [disabled]="disabled() || star < effectiveMin()"
+    (click)="value.set(star)">
+    {{ star <= value() ? '★' : '☆' }}
+  </button>
 }
 ```
 
@@ -152,13 +195,22 @@ The control contains **no validation code and no error display**. The schema dec
 
 ## 3. The custom validator – `minWords`
 
-`minLength` counts characters, but an abstract should be measured in **words**. A custom validator is just a function that takes a schema path and calls `validate()` on it:
+`minLength` counts characters, but an abstract should be measured in **words**. A custom validator is just a function that takes a schema path and calls `validate()` on it. We wrote it **twice**, in two versions.
+
+The word counting itself is a one-line utility, prepared **ahead of the session** (the regex is not the point of the demo):
+
+```ts
+export function countWords(text: string): number {
+  return text.trim().split(/\s+/).filter(Boolean).length;
+}
+```
+
+### Version 1 – `min` is a number
 
 ```ts
 export function minWords(path: SchemaPath<string>, min: number, options?: { message?: string }) {
-  validate(path, ({ value }) => {
-    const words = value().trim().split(/\s+/).filter(Boolean).length;
-    return words < min
+  validate(path, (ctx) => {
+    return countWords(ctx.value()) < min
       ? { kind: 'minWords', message: options?.message ?? `Please write at least ${min} words` }
       : undefined;
   });
@@ -172,10 +224,36 @@ required(p.abstract);
 minWords(p.abstract, 30);
 ```
 
+### Version 2 – `min` is a number **or a `LogicFn`**
+
+The built-in validators don't only take fixed limits — they also accept a **`LogicFn`**, a function that receives the `FieldContext` and computes the limit reactively. We upgraded `minWords` to do the same, so the minimum can **depend on other fields**:
+
+```ts
+export function minWords(
+  path: SchemaPath<string>,
+  min: number | LogicFn<string, number>,
+  options?: { message?: string },
+) {
+  validate(path, (ctx) => {
+    const minValue = typeof min === 'number' ? min : min(ctx);
+    return countWords(ctx.value()) < minValue
+      ? { kind: 'minWords', message: options?.message ?? `Please write at least ${minValue} words` }
+      : undefined;
+  });
+}
+```
+
+Usage: the self-declared experts have to prove it — the required word count now follows the expertise rating:
+
+```ts
+minWords(p.abstract, (ctx) => ctx.valueOf(p.expertise) >= 4 ? 20 : 10);
+```
+
 ### Points to remember
 - **Returning `undefined`** means the value is valid.
 - **The returned error** has a `kind`, which you can check in code, and a `message`, which `<app-field>` shows automatically.
-- **Same shape as the built-ins.** Following the `(path, ..., options)` signature makes custom validators feel like part of the framework.
+- **Same shape as the built-ins.** Following the `(path, number | LogicFn, options)` signature makes custom validators feel like part of the framework.
+- **`LogicFn` is the reactivity hook.** It runs inside the validation's reactive context, so reading another field with `ctx.valueOf(p.expertise)` creates a dependency — when the rating changes, the abstract is re-validated automatically.
 
 > **To be continued at the conference.** Built-in validators such as `minLength` also *publish* their limit, which is why `<app-field>` can show "at least 3 characters" before anything is typed. Our `minWords` doesn't do this yet, so the wrapper can't show "at least 30 words". We'll cover how to do it, along with several other features, in the conference talk.
 
