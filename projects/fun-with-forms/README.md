@@ -265,7 +265,27 @@ Some fields share the same rules. A name should follow the same rules whether it
 
 ### 4a. A rule function – `personName`
 
-A plain function that applies **several validators to one field**. Each pattern checks **one kind of mistake**, so each mistake gets its own error message:
+A plain function that applies **several validators to one field**. Each pattern checks **one kind of mistake**, so each mistake gets its own error message.
+
+The regular expressions are prepared **ahead of the session** in `src/app/utils/name-patterns.ts` — live-typing a regex is nobody's idea of fun:
+
+```ts
+/** Only letters are allowed. */
+export const LETTERS_ONLY = /^[a-zA-Z]*$/;
+
+/** Only letters (from any language), spaces, hyphens (-) and apostrophes (') are allowed. */
+export const UNICODE_LETTERS_AND_SEPARATORS = /^[\p{L} '-]*$/u;
+
+/** The name must start and end with a letter. */
+export const STARTS_AND_ENDS_WITH_LETTER = /^\p{L}(.*\p{L})?$/u;
+
+/** Separators (space, - or ') must not appear next to each other. */
+export const NO_CONSECUTIVE_SEPARATORS = /^(?!.*[ '-]{2})/u;
+```
+
+The demo starts innocently with `LETTERS_ONLY` — the name gives nothing away — and real names immediately prove it wrong, twice over. Polish letters fail: *Łukasz*, *Michał* and *Grzegorz* are all "invalid". But so do perfectly ordinary names with separators: *O'Brien*, *Jean-Pierre*, *Mary Ann* — and the ultimate counter-example, *Skłodowska-Curie*, which fails on **both** counts (the `ł` and the hyphen). The fix is `UNICODE_LETTERS_AND_SEPARATORS`: `\p{L}` with the `u` flag matches a letter from **any** alphabet, and the character class also admits spaces, hyphens and apostrophes.
+
+In the session we only write the rule function that puts them to work:
 
 ```ts
 export function personName(path: SchemaPath<string>) {
@@ -273,11 +293,11 @@ export function personName(path: SchemaPath<string>) {
   minLength(path, 2, { message: 'Name is too short' });
   maxLength(path, 40, { message: 'Name is too long' });
 
-  pattern(path, /^[\p{L} '-]*$/u,
+  pattern(path, UNICODE_LETTERS_AND_SEPARATORS,
     { message: "Only letters, spaces, hyphens (-) and apostrophes (') are allowed" });
-  pattern(path, /^\p{L}(.*\p{L})?$/u,
+  pattern(path, STARTS_AND_ENDS_WITH_LETTER,
     { message: 'Name must start and end with a letter' });
-  pattern(path, /^(?!.*[ '-]{2})/u,
+  pattern(path, NO_CONSECUTIVE_SEPARATORS,
     { message: "Separators (space, - or ') cannot appear next to each other" });
 }
 ```
