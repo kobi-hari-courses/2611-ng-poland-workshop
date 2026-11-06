@@ -37,4 +37,13 @@
 4. Implement the `talkSchema` (`src/app/schemas/talk.schema.ts`).
 5. Replace the main form to use it — making the form ts file tiny.
 6. Now we have a reusable schema for the entire model, in case such objects appear in other places.
-7. Move to branch `main`, which contains the whole code.
+7. Move to branch `s05---schemas`, which contains the whole code.
+
+## If time permits - on branch `s05---schemas`
+1. Solve the problem that the minWords validator doesn't produce metadata that can be presented in the field wrapper hints. We do it like this
+    - Create a metadata key for the minimum word count in the validator.
+    - Populate this metadata in the validator code
+    - Add another "hint" function that reads this metadata and generates a user-friendly message for the field wrapper.
+    - Add this possible hint to the "buildHints" function in the field wrapper, so it can be displayed as a hint.
+2. Move to branch `s06---min-words-hints` where this is implemented.
+
