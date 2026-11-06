@@ -20,6 +20,7 @@
   --radius-lg: 16px;
   --shadow-card: 0 10px 30px -12px rgb(36 36 58 / 0.18);
   --focus-ring: 0 0 0 3px color-mix(in srgb, var(--color-primary) 25%, transparent);
+  --focus-ring-danger: 0 0 0 3px color-mix(in srgb, var(--color-danger) 12%, transparent);
 
   /* Typography */
   --font-body: 'Segoe UI', system-ui, -apple-system, sans-serif;

@@ -69,6 +69,19 @@ textarea:focus {
   box-shadow: var(--focus-ring);
 }
 
+/* ===== Invalid state (class applied by Signal Forms config) ===== */
+input.invalid,
+textarea.invalid {
+  border-color: color-mix(in srgb, var(--color-danger) 45%, var(--color-border));
+  background: color-mix(in srgb, var(--color-danger) 3%, var(--color-surface));
+}
+
+input.invalid:focus,
+textarea.invalid:focus {
+  border-color: color-mix(in srgb, var(--color-danger) 65%, var(--color-border));
+  box-shadow: var(--focus-ring-danger);
+}
+
 .field small {
   color: var(--color-muted);
   font-size: 0.8rem;
