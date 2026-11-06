@@ -1,0 +1,26 @@
+/* ===== Design tokens ===== */
+:root {
+  /* Colors */
+  --color-primary: #6246ea;
+  --color-primary-strong: #4b32d4;
+  --color-primary-soft: #eceafc;
+  --color-accent: #f2545b;
+  --color-accent-soft: #fdecec;
+  --color-info: #0e9bd8;
+  --color-danger: #d7263d;
+  --color-text: #24243a;
+  --color-muted: #6b7280;
+  --color-border: #d8d9e4;
+  --color-surface: #ffffff;
+  --color-background: #f3f3fb;
+
+  /* Shape & depth */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --shadow-card: 0 10px 30px -12px rgb(36 36 58 / 0.18);
+  --focus-ring: 0 0 0 3px color-mix(in srgb, var(--color-primary) 25%, transparent);
+
+  /* Typography */
+  --font-body: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
