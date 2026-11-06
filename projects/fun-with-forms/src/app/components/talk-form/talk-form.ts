@@ -17,6 +17,7 @@ import {
 import { FieldWrapper } from '../field-wrapper/field-wrapper';
 import { Rating } from '../rating/rating';
 import { minWords } from '../../validators/min-words';
+import { personName } from '../../validators/person-name';
 
 @Component({
   selector: 'app-talk-form',
@@ -38,13 +39,8 @@ export class TalkForm {
     min(p.expertise, 1);
     max(p.expertise, 5);
 
-    required(p.speaker.firstName);
-    minLength(p.speaker.firstName, 2);
-    maxLength(p.speaker.firstName, 40);
-
-    required(p.speaker.lastName);
-    minLength(p.speaker.lastName, 2);
-    maxLength(p.speaker.lastName, 40);
+    personName(p.speaker.firstName);
+    personName(p.speaker.lastName);
 
     required(p.speaker.email);
     email(p.speaker.email);
@@ -52,13 +48,8 @@ export class TalkForm {
     maxLength(p.speaker.bio, 500);
 
     applyEach(p.coSpeakers, (s) => {
-      required(s.firstName);
-      minLength(s.firstName, 2);
-      maxLength(s.firstName, 40);
-
-      required(s.lastName);
-      minLength(s.lastName, 2);
-      maxLength(s.lastName, 40);
+      personName(s.firstName);
+      personName(s.lastName);
 
       required(s.email);
       email(s.email);
