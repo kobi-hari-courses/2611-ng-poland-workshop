@@ -346,10 +346,11 @@ Reusing it in the talk schema, extracted from the component into `src/app/schema
 ```ts
 export const talkSchema = schema<TalkSubmission>((p) => {
   required(p.title);
+  minLength(p.title, 3);
   maxLength(p.title, 80);
 
   required(p.abstract);
-  minWords(p.abstract, 30);
+  minWords(p.abstract, (ctx) => ctx.valueOf(p.expertise) >= 4 ? 20 : 10);
 
   min(p.expertise, 1);
   max(p.expertise, 5);
